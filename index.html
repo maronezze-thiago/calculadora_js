@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora</title>
+  <style>
+
+    /* ─── RESET ─── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ─── PÁGINA ─── */
+    body {
+      background-color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ─── CONTAINER DA CALCULADORA ─── */
+    .calculadora {
+      background-color: #2a2a2a;
+      border-radius: 16px;
+      padding: 24px;
+      width: 320px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ─── DISPLAY ─── */
+    .display {
+      background-color: #111;
+      border-radius: 10px;
+      padding: 20px 16px 12px;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+
+    /* Mostra a operação atual ex: 5 + */
+    .display .operacao {
+      font-size: 14px;
+      color: #666;
+      min-height: 20px;
+      margin-bottom: 8px;
+    }
+
+    /* Mostra o número atual */
+    .display .resultado {
+      font-size: 40px;
+      color: #ffffff;
+      font-weight: 300;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ─── GRID DE BOTÕES ─── */
+    .botoes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    /* ─── BOTÃO BASE ─── */
+    button {
+      padding: 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* ─── TIPOS DE BOTÃO ─── */
+
+    /* Cinza — números */
+    .btn-numero {
+      background-color: #3a3a3a;
+      color: #ffffff;
+    }
+
+    /* Laranja — operadores */
+    .btn-operador {
+      background-color: #F85E11;
+      color: #ffffff;
+    }
+
+    /* Cinza claro — funções (AC, +/-, %) */
+    .btn-funcao {
+      background-color: #555;
+      color: #ffffff;
+    }
+
+    /* Ocupa 2 colunas — botão zero */
+    .btn-zero {
+      grid-column: span 2;
+      text-align: left;
+      padding-left: 24px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="calculadora">
+
+    <!-- DISPLAY -->
+    <div class="display">
+      <div class="operacao" id="operacao"></div>
+      <div class="resultado" id="resultado">0</div>
+    </div>
+
+    <!-- BOTÕES -->
+    <div class="botoes">
+
+      <!-- Linha 1 -->
+      <button class="btn-funcao" onclick="limpar()">AC</button>
+      <button class="btn-funcao" onclick="inverterSinal()">+/-</button>
+      <button class="btn-funcao" onclick="porcentagem()">%</button>
+      <button class="btn-operador" onclick="escolherOperador('÷')">÷</button>
+
+      <!-- Linha 2 -->
+      <button class="btn-numero" onclick="digitarNumero('7')">7</button>
+      <button class="btn-numero" onclick="digitarNumero('8')">8</button>
+      <button class="btn-numero" onclick="digitarNumero('9')">9</button>
+      <button class="btn-operador" onclick="escolherOperador('×')">×</button>
+
+      <!-- Linha 3 -->
+      <button class="btn-numero" onclick="digitarNumero('4')">4</button>
+      <button class="btn-numero" onclick="digitarNumero('5')">5</button>
+      <button class="btn-numero" onclick="digitarNumero('6')">6</button>
+      <button class="btn-operador" onclick="escolherOperador('-')">−</button>
+
+      <!-- Linha 4 -->
+      <button class="btn-numero" onclick="digitarNumero('1')">1</button>
+      <button class="btn-numero" onclick="digitarNumero('2')">2</button>
+      <button class="btn-numero" onclick="digitarNumero('3')">3</button>
+      <button class="btn-operador" onclick="escolherOperador('+')">+</button>
+
+      <!-- Linha 5 -->
+      <button class="btn-numero btn-zero" onclick="digitarNumero('0')">0</button>
+      <button class="btn-numero" onclick="digitarDecimal()">.</button>
+      <button class="btn-operador" onclick="calcular()">=</button>
+
+    </div>
+  </div>
+
+  <script>
+
+    let numeroAtual = '0'
+    let numeroAnterior = ''
+    let operador = ''
+    let novaEntrada = false
+
+
+    const displayResultado = document.querySelector('#resultado')
+    const displayOperacao = document.querySelector('#operacao')
+
+
+
+    function atualizarDisplay(){
+        displayResultado.textContent = numeroAtual
+    }
+    function digitarNumero(num){
+        if(numeroAtual === '0'|| novaEntrada){
+            numeroAtual = num
+            novaEntrada = false
+        }else{
+            if(numeroAtual.length >= 10 ) return
+            numeroAtual += num
+        }
+        atualizarDisplay()
+    }
+    function digitarDecimal(){
+        if(novaEntrada){
+            numeroAtual = '0.'
+            novaEntrada = false
+            atualizarDisplay()
+            return
+        }
+        if(!numeroAtual.includes('.')){
+            numeroAtual += '.'
+            atualizarDisplay()
+        }
+    }
+
+
+    function escolherOperador(op){
+
+
+         numeroAnterior = numeroAtual
+    operador = op
+    novaEntrada = true
+
+    displayOperacao.textContent = `${numeroAnterior}${operador}`
+        calcular()
+
+    }
+   
+
+
+    function calcular(){
+        if(!operador||novaEntrada) return
+
+        const num1 = parseFloat(numeroAnterior)
+        const num2 = parseFloat(numeroAtual)
+        let resultado
+
+        
+        
+        if(operador === '+'){
+           
+       resultado = num1 + num2
+        }else if(operador === '-'){
+            resultado = num1 - num2
+            
+        }else if(operador === '×'){
+            resultado = num1 * num2
+        }else if(operador === '÷'){
+    
+
+    if(num2 === 0){
+        numeroAtual = 'erro'
+        operador = ''
+        displayOperacao.textContent = ''
+        atualizarDisplay()
+        return
+        }
+        resultado = num1/num2
+    }
+
+  
+
+
+
+    displayOperacao.textContent = `${numeroAnterior}${operador}${numeroAtual}=`
+
+    numeroAtual = parseFloat(resultado.toFixed(10)).toString()
+
+    operador = ''
+    novaEntrada = true
+
+    atualizarDisplay()
+} 
+
+
+
+function limpar(){
+    numeroAtual = '0'
+    numeroAnterior = ''
+    operador = ''
+    novaEntrada = false
+    displayOperacao.textContent = ''
+    atualizarDisplay()
+    }
+
+    function inverterSinal(){
+        if(numeroAtual === '0' || numeroAtual === 'erro')return
+        numeroAtual = (parseFloat(numeroAtual) * -1).toString()
+        atualizarDisplay()
+    }
+
+    function porcentagem(){
+        if(numeroAtual === 'erro')return
+        numeroAtual = (parseFloat(numeroAtual) / 100).toString()
+        atualizarDisplay()
+    }
+
+
+  </script>
+
+</body>
+</html>
